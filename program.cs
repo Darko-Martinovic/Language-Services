@@ -364,20 +364,46 @@ async Task DemoHealthcareNerAsync()
 // ---------------------------------------------------------------------------
 Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-Console.WriteLine($"\n{Sep}");
-Console.WriteLine("  AZURE LANGUAGE SERVICE — CAPABILITY SHOWCASE (C#)");
-Console.WriteLine(Sep);
+var menu = new (string Label, Func<Task> Action)[]
+{
+    ("Language Detection",              () => { DemoLanguageDetection();      return Task.CompletedTask; }),
+    ("Sentiment Analysis",              () => { DemoSentimentAnalysis();       return Task.CompletedTask; }),
+    ("Key Phrase Extraction",           () => { DemoKeyPhrases();              return Task.CompletedTask; }),
+    ("Named Entity Recognition (NER)",  () => { DemoNer();                     return Task.CompletedTask; }),
+    ("Entity Linking (Wikipedia)",      () => { DemoEntityLinking();           return Task.CompletedTask; }),
+    ("PII Detection",                   () => { DemoPiiDetection();            return Task.CompletedTask; }),
+    ("Abstractive Text Summarization",  DemoAbstractiveSummaryAsync),
+    ("Extractive Text Summarization",   DemoExtractiveSummaryAsync),
+    ("Healthcare Entity Recognition",   DemoHealthcareNerAsync),
+};
 
-DemoLanguageDetection();
-DemoSentimentAnalysis();
-DemoKeyPhrases();
-DemoNer();
-DemoEntityLinking();
-DemoPiiDetection();
-await DemoAbstractiveSummaryAsync();
-await DemoExtractiveSummaryAsync();
-await DemoHealthcareNerAsync();
+while (true)
+{
+    Console.WriteLine($"\n{Sep}");
+    Console.WriteLine("  AZURE LANGUAGE SERVICE — CAPABILITY SHOWCASE (C#)");
+    Console.WriteLine(Sep);
+    for (int i = 0; i < menu.Length; i++)
+        Console.WriteLine($"  {i + 1}. {menu[i].Label}");
+    Console.WriteLine($"  0. Exit");
+    Console.WriteLine(Sep);
+    Console.Write($"  Select (0-{menu.Length}): ");
+
+    var input = Console.ReadLine()?.Trim();
+    if (input == "0" || input == null) break;
+
+    if (int.TryParse(input, out int choice) && choice >= 1 && choice <= menu.Length)
+    {
+        await menu[choice - 1].Action();
+        Console.WriteLine($"\n{Sep}");
+        Console.Write("  Press Enter to return to menu...");
+        Console.ReadLine();
+    }
+    else
+    {
+        Console.WriteLine($"  Invalid selection. Please enter a number between 0 and {menu.Length}.");
+    }
+}
 
 Console.WriteLine($"\n{Sep}");
-Console.WriteLine("  Done!");
+Console.WriteLine("  Goodbye!");
 Console.WriteLine($"{Sep}\n");
