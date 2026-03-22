@@ -391,6 +391,53 @@ async Task DemoHealthcareNerAsync()
 }
 
 // ---------------------------------------------------------------------------
+// 10. Custom Single-Label Text Classification
+// ---------------------------------------------------------------------------
+async Task DemoCustomSingleLabelClassificationAsync()
+{
+    Section("10. CUSTOM SINGLE-LABEL TEXT CLASSIFICATION");
+
+    const string projectName    = "singlelabelclassification";
+    const string deploymentName = "learn-text-classfication";
+    const string dataFolder     = "Data/Classification";
+
+    var fileNames = new[] { "Test1.txt", "Test2.txt", "Test3.txt" };
+
+    var documents = fileNames
+        .Select((name, i) => new TextDocumentInput((i + 1).ToString(), File.ReadAllText(Path.Combine(dataFolder, name))) { Language = "en" })
+        .ToList();
+
+    Console.WriteLine($"  Classifying {documents.Count} documents using project '{projectName}', deployment '{deploymentName}'...\n");
+
+    var operation = await client.SingleLabelClassifyAsync(
+        WaitUntil.Completed,
+        documents,
+        projectName,
+        deploymentName
+    );
+
+    int docIndex = 0;
+    await foreach (var page in operation.Value)
+    {
+        foreach (var result in page)
+        {
+            var fileName = fileNames[docIndex++];
+            if (!result.HasError)
+            {
+                var best = result.ClassificationCategories
+                    .OrderByDescending(c => c.ConfidenceScore)
+                    .First();
+                Console.WriteLine($"  [{fileName,-10}]  Category: {best.Category,-30} Confidence: {best.ConfidenceScore:F2}");
+            }
+            else
+            {
+                Console.WriteLine($"  [{fileName,-10}]  Error: {result.Error.Message}");
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -448,6 +495,7 @@ var menu = new (string Label, Func<Task> Action)[]
     ("Abstractive Text Summarization", DemoAbstractiveSummaryAsync),
     ("Extractive Text Summarization", DemoExtractiveSummaryAsync),
     ("Healthcare Entity Recognition", DemoHealthcareNerAsync),
+    ("Custom Single-Label Classification", DemoCustomSingleLabelClassificationAsync),
 };
 
 while (true)
