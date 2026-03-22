@@ -6,9 +6,11 @@
 using Azure;
 using Azure.AI.TextAnalytics;
 
-var Endpoint = Environment.GetEnvironmentVariable("AZURE_LANGUAGE_ENDPOINT")
+var Endpoint =
+    Environment.GetEnvironmentVariable("AZURE_LANGUAGE_ENDPOINT")
     ?? throw new InvalidOperationException("Set the AZURE_LANGUAGE_ENDPOINT environment variable.");
-var Key = Environment.GetEnvironmentVariable("AZURE_LANGUAGE_KEY")
+var Key =
+    Environment.GetEnvironmentVariable("AZURE_LANGUAGE_KEY")
     ?? throw new InvalidOperationException("Set the AZURE_LANGUAGE_KEY environment variable.");
 const string Sep = "======================================================================";
 
@@ -45,7 +47,9 @@ void DemoLanguageDetection()
         {
             var lang = result.PrimaryLanguage;
             var snippet = text.Length > 45 ? text[..45] : text;
-            Console.WriteLine($"  '{snippet}' -> {lang.Name} ({lang.Iso6391Name}) | confidence: {lang.ConfidenceScore:F2}");
+            Console.WriteLine(
+                $"  '{snippet}' -> {lang.Name} ({lang.Iso6391Name}) | confidence: {lang.ConfidenceScore:F2}"
+            );
         }
         else
         {
@@ -79,18 +83,24 @@ void DemoSentimentAnalysis()
         {
             var snippet = text.Length > 70 ? text[..70] : text;
             Console.WriteLine($"\n  Text     : {snippet}");
-            Console.WriteLine($"  Sentiment: {result.DocumentSentiment.Sentiment.ToString().ToUpper()} " +
-                              $"(pos={result.DocumentSentiment.ConfidenceScores.Positive:F2}, " +
-                              $"neu={result.DocumentSentiment.ConfidenceScores.Neutral:F2}, " +
-                              $"neg={result.DocumentSentiment.ConfidenceScores.Negative:F2})");
+            Console.WriteLine(
+                $"  Sentiment: {result.DocumentSentiment.Sentiment.ToString().ToUpper()} "
+                    + $"(pos={result.DocumentSentiment.ConfidenceScores.Positive:F2}, "
+                    + $"neu={result.DocumentSentiment.ConfidenceScores.Neutral:F2}, "
+                    + $"neg={result.DocumentSentiment.ConfidenceScores.Negative:F2})"
+            );
 
             foreach (var sentence in result.DocumentSentiment.Sentences)
             {
                 foreach (var opinion in sentence.Opinions)
                 {
-                    var assessments = string.Join(", ",
-                        opinion.Assessments.Select(a => $"{a.Sentiment}({a.Text})"));
-                    Console.WriteLine($"    Opinion -> target='{opinion.Target.Text}' | assessments=[{assessments}]");
+                    var assessments = string.Join(
+                        ", ",
+                        opinion.Assessments.Select(a => $"{a.Sentiment}({a.Text})")
+                    );
+                    Console.WriteLine(
+                        $"    Opinion -> target='{opinion.Target.Text}' | assessments=[{assessments}]"
+                    );
                 }
             }
         }
@@ -154,7 +164,9 @@ void DemoNer()
             Console.WriteLine($"\n  Text: {snippet}");
             foreach (var entity in result.Entities)
             {
-                Console.WriteLine($"    [{entity.Category,-20}] '{entity.Text}' (confidence: {entity.ConfidenceScore:F2})");
+                Console.WriteLine(
+                    $"    [{entity.Category, -20}] '{entity.Text}' (confidence: {entity.ConfidenceScore:F2})"
+                );
             }
         }
         else
@@ -221,7 +233,7 @@ void DemoPiiDetection()
             Console.WriteLine($"  Redacted : {redacted}");
             foreach (var entity in result.Entities)
             {
-                Console.WriteLine($"    [{entity.Category,-30}] '{entity.Text}'");
+                Console.WriteLine($"    [{entity.Category, -30}] '{entity.Text}'");
             }
         }
         else
@@ -240,17 +252,21 @@ async Task DemoAbstractiveSummaryAsync()
 
     var documents = new List<TextDocumentInput>
     {
-        new TextDocumentInput("1",
-            "The COVID-19 pandemic, caused by the SARS-CoV-2 coronavirus, began in late 2019 " +
-            "in Wuhan, China, and rapidly spread worldwide, leading the World Health Organization " +
-            "to declare a global pandemic in March 2020. Governments around the world implemented " +
-            "lockdowns, travel restrictions, and mask mandates to slow transmission. The pandemic " +
-            "accelerated the development of mRNA vaccines, with Pfizer-BioNTech and Moderna " +
-            "receiving emergency authorization by late 2020. The economic impact was severe, " +
-            "causing the sharpest recession since the Great Depression. By 2022, widespread " +
-            "vaccination campaigns had significantly reduced severe illness and death, though " +
-            "variants like Delta and Omicron continued to challenge public health systems globally.")
-        { Language = "en" }
+        new TextDocumentInput(
+            "1",
+            "The COVID-19 pandemic, caused by the SARS-CoV-2 coronavirus, began in late 2019 "
+                + "in Wuhan, China, and rapidly spread worldwide, leading the World Health Organization "
+                + "to declare a global pandemic in March 2020. Governments around the world implemented "
+                + "lockdowns, travel restrictions, and mask mandates to slow transmission. The pandemic "
+                + "accelerated the development of mRNA vaccines, with Pfizer-BioNTech and Moderna "
+                + "receiving emergency authorization by late 2020. The economic impact was severe, "
+                + "causing the sharpest recession since the Great Depression. By 2022, widespread "
+                + "vaccination campaigns had significantly reduced severe illness and death, though "
+                + "variants like Delta and Omicron continued to challenge public health systems globally."
+        )
+        {
+            Language = "en",
+        },
     };
 
     var operation = await client.AbstractiveSummarizeAsync(WaitUntil.Completed, documents);
@@ -280,21 +296,29 @@ async Task DemoExtractiveSummaryAsync()
 
     var documents = new List<TextDocumentInput>
     {
-        new TextDocumentInput("1",
-            "Renewable energy sources are becoming increasingly important in the fight against " +
-            "climate change. Solar power has seen dramatic cost reductions over the past decade, " +
-            "making it one of the cheapest forms of electricity in many regions. Wind energy has " +
-            "also grown substantially, with offshore wind farms capable of generating electricity " +
-            "for millions of homes. Battery storage technology is improving rapidly, addressing " +
-            "the intermittency challenge of renewables. Governments worldwide are setting ambitious " +
-            "net-zero targets, with many pledging to phase out fossil fuel subsidies and invest " +
-            "heavily in clean energy infrastructure. The transition to renewables is also creating " +
-            "millions of new jobs in manufacturing, installation, and maintenance.")
-        { Language = "en" }
+        new TextDocumentInput(
+            "1",
+            "Renewable energy sources are becoming increasingly important in the fight against "
+                + "climate change. Solar power has seen dramatic cost reductions over the past decade, "
+                + "making it one of the cheapest forms of electricity in many regions. Wind energy has "
+                + "also grown substantially, with offshore wind farms capable of generating electricity "
+                + "for millions of homes. Battery storage technology is improving rapidly, addressing "
+                + "the intermittency challenge of renewables. Governments worldwide are setting ambitious "
+                + "net-zero targets, with many pledging to phase out fossil fuel subsidies and invest "
+                + "heavily in clean energy infrastructure. The transition to renewables is also creating "
+                + "millions of new jobs in manufacturing, installation, and maintenance."
+        )
+        {
+            Language = "en",
+        },
     };
 
     var options = new ExtractiveSummarizeOptions { MaxSentenceCount = 3 };
-    var operation = await client.ExtractiveSummarizeAsync(WaitUntil.Completed, documents, options: options);
+    var operation = await client.ExtractiveSummarizeAsync(
+        WaitUntil.Completed,
+        documents,
+        options: options
+    );
     await foreach (var page in operation.Value)
     {
         foreach (var result in page)
@@ -320,13 +344,13 @@ async Task DemoHealthcareNerAsync()
     Section("9. HEALTHCARE ENTITY RECOGNITION");
 
     var inputText =
-        "The patient was prescribed 500mg of Amoxicillin twice daily for a bacterial infection. " +
-        "She has a known allergy to Penicillin. Blood pressure was 130/85 mmHg. " +
-        "She was also diagnosed with Type 2 Diabetes and prescribed Metformin 1000mg.";
+        "The patient was prescribed 500mg of Amoxicillin twice daily for a bacterial infection. "
+        + "She has a known allergy to Penicillin. Blood pressure was 130/85 mmHg. "
+        + "She was also diagnosed with Type 2 Diabetes and prescribed Metformin 1000mg.";
 
     var documents = new List<TextDocumentInput>
     {
-        new TextDocumentInput("1", inputText) { Language = "en" }
+        new TextDocumentInput("1", inputText) { Language = "en" },
     };
 
     var operation = await client.AnalyzeHealthcareEntitiesAsync(WaitUntil.Completed, documents);
@@ -336,17 +360,24 @@ async Task DemoHealthcareNerAsync()
         {
             if (!result.HasError)
             {
-                Console.WriteLine($"\n  Text: {(inputText.Length > 90 ? inputText[..90] : inputText)}...");
+                Console.WriteLine(
+                    $"\n  Text: {(inputText.Length > 90 ? inputText[..90] : inputText)}..."
+                );
                 Console.WriteLine("  Entities:");
                 foreach (var entity in result.Entities)
-                    Console.WriteLine($"    [{entity.Category,-30}] '{entity.Text}' (confidence: {entity.ConfidenceScore:F2})");
+                    Console.WriteLine(
+                        $"    [{entity.Category, -30}] '{entity.Text}' (confidence: {entity.ConfidenceScore:F2})"
+                    );
 
                 if (result.EntityRelations.Count > 0)
                 {
                     Console.WriteLine("  Relations:");
                     foreach (var relation in result.EntityRelations)
                     {
-                        var roles = string.Join(" -> ", relation.Roles.Select(r => $"'{r.Entity.Text}'({r.Name})"));
+                        var roles = string.Join(
+                            " -> ",
+                            relation.Roles.Select(r => $"'{r.Entity.Text}'({r.Name})")
+                        );
                         Console.WriteLine($"    {relation.RelationType}: {roles}");
                     }
                 }
@@ -366,15 +397,57 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 var menu = new (string Label, Func<Task> Action)[]
 {
-    ("Language Detection",              () => { DemoLanguageDetection();      return Task.CompletedTask; }),
-    ("Sentiment Analysis",              () => { DemoSentimentAnalysis();       return Task.CompletedTask; }),
-    ("Key Phrase Extraction",           () => { DemoKeyPhrases();              return Task.CompletedTask; }),
-    ("Named Entity Recognition (NER)",  () => { DemoNer();                     return Task.CompletedTask; }),
-    ("Entity Linking (Wikipedia)",      () => { DemoEntityLinking();           return Task.CompletedTask; }),
-    ("PII Detection",                   () => { DemoPiiDetection();            return Task.CompletedTask; }),
-    ("Abstractive Text Summarization",  DemoAbstractiveSummaryAsync),
-    ("Extractive Text Summarization",   DemoExtractiveSummaryAsync),
-    ("Healthcare Entity Recognition",   DemoHealthcareNerAsync),
+    (
+        "Language Detection",
+        () =>
+        {
+            DemoLanguageDetection();
+            return Task.CompletedTask;
+        }
+    ),
+    (
+        "Sentiment Analysis",
+        () =>
+        {
+            DemoSentimentAnalysis();
+            return Task.CompletedTask;
+        }
+    ),
+    (
+        "Key Phrase Extraction",
+        () =>
+        {
+            DemoKeyPhrases();
+            return Task.CompletedTask;
+        }
+    ),
+    (
+        "Named Entity Recognition (NER)",
+        () =>
+        {
+            DemoNer();
+            return Task.CompletedTask;
+        }
+    ),
+    (
+        "Entity Linking (Wikipedia)",
+        () =>
+        {
+            DemoEntityLinking();
+            return Task.CompletedTask;
+        }
+    ),
+    (
+        "PII Detection",
+        () =>
+        {
+            DemoPiiDetection();
+            return Task.CompletedTask;
+        }
+    ),
+    ("Abstractive Text Summarization", DemoAbstractiveSummaryAsync),
+    ("Extractive Text Summarization", DemoExtractiveSummaryAsync),
+    ("Healthcare Entity Recognition", DemoHealthcareNerAsync),
 };
 
 while (true)
@@ -389,7 +462,8 @@ while (true)
     Console.Write($"  Select (0-{menu.Length}): ");
 
     var input = Console.ReadLine()?.Trim();
-    if (input == "0" || input == null) break;
+    if (input == "0" || input == null)
+        break;
 
     if (int.TryParse(input, out int choice) && choice >= 1 && choice <= menu.Length)
     {
@@ -400,7 +474,9 @@ while (true)
     }
     else
     {
-        Console.WriteLine($"  Invalid selection. Please enter a number between 0 and {menu.Length}.");
+        Console.WriteLine(
+            $"  Invalid selection. Please enter a number between 0 and {menu.Length}."
+        );
     }
 }
 
